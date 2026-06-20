@@ -11,18 +11,23 @@ import 'package:shop/utils/popups/snackbar_helpers.dart';
 class FavouriteController extends GetxController{
   static FavouriteController get instance => Get.find();
   RxMap<String, bool> favourites = <String, bool>{}.obs;
-  final _storage = GetStorage(AuthenticationRepo.instance.currentUser!.uid);
+  late GetStorage _storage = GetStorage(AuthenticationRepo.instance.currentUser!.uid);
 
 
   @override
   void onInit() {
-    initFavourite();
+    final user = AuthenticationRepo.instance.currentUser;
+
+    if (user != null) {
+      _storage = GetStorage(user.uid);
+      initFavourite();
+    }
     super.onInit();
   }
   Future<void> initFavourite() async{
-   String? encodeFavourite =  _storage.read('favourite');
-   if(encodeFavourite == null) return;
-   Map<String, dynamic> storedFavourite =  jsonEncode(encodeFavourite) as Map<String, dynamic>;
+   String? encodedFavourite =  _storage.read('favourite');
+   if(encodedFavourite == null) return;
+   Map<String, dynamic> storedFavourite =  jsonDecode(encodedFavourite);
 
    favourites.assignAll(storedFavourite.map((key,value)=> MapEntry(key, value as bool)));
   }

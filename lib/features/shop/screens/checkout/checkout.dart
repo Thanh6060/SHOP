@@ -29,11 +29,12 @@ class CheckoutScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final promoCodeController = Get.put(PromoCodeController());
+    final promoCodeController = Get.put(PromoCodeController(), permanent: true);
     final cartController = CartController.instance;
-    double subTotal = cartController.totalCartPrice.value;
 
-    double totalPrice = UPricingCalculator.calculateTotalPrice(subTotal, 'VietNam');
+
+
+
 
     final checkoutController = Get.put(CheckoutController());
     return Obx(
@@ -74,16 +75,24 @@ class CheckoutScreen extends StatelessWidget {
 
           bottomNavigationBar: Obx(
               (){
+                double subTotal = cartController.totalCartPrice.value;
+
+                
+                double baseTotal = UPricingCalculator.calculateTotalPrice(subTotal, 'VietNam');
+
+
                 final promoCode = promoCodeController.appliedPromoCode.value;
-                totalPrice = promoCodeController.calculatePriceAfterDiscount(promoCode, totalPrice);
+
+
+                final double finalPrice = promoCodeController.calculatePriceAfterDiscount(promoCode, baseTotal);
               return  Padding(
                   padding: const EdgeInsets.all(USizes.defaultSpace),
                   child: UElevatedButton(
                       onPressed: subTotal > 0
-                          ? ()=> checkoutController.checkout(totalPrice)
+                          ? ()=> checkoutController.checkout(finalPrice)
                           : ()=> USnackBarHelpers.errorSnackBar(title: 'Empty Cart',message: 'Add items in the cart')
                       ,
-                      child: Text("Checkout ${UTexts.currency}${totalPrice.toStringAsFixed(2)}")),
+                      child: Text("Checkout ${UTexts.currency}${finalPrice.toStringAsFixed(2)}")),
                 );
               }
           ),

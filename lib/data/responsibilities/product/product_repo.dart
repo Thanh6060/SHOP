@@ -78,12 +78,14 @@ class ProductRepo extends GetxController{
       throw UPlatformException(e.code).message;
     }catch(e){
 
+
       throw "Something went wrong. Please try again";
     }
   }
   Future<List<ProductModel>> fetchAllProduct()async {
     try{
       final query = await _database.collection(UKeys.productsCollection).get();
+
       if(query.docs.isNotEmpty){
         List<ProductModel> products = query.docs.map((document)=> ProductModel.fromSnapshot(document)).toList();
         return products;
@@ -97,6 +99,7 @@ class ProductRepo extends GetxController{
     } on PlatformException catch(e){
       throw UPlatformException(e.code).message;
     }catch(e){
+      print('lỗi : $e');
       throw "Something went wrong. Please try again";
     }
 
@@ -118,6 +121,7 @@ class ProductRepo extends GetxController{
       throw UPlatformException(e.code).message;
     }catch(e){
 
+
       throw "Something went wrong. Please try again";
     }
 
@@ -127,6 +131,7 @@ class ProductRepo extends GetxController{
 
 
      final query = await _database.collection(UKeys.productsCollection).where('isFeatured',isEqualTo: true).limit(4).get();
+
 
 
      if(query.docs.isNotEmpty){
@@ -146,6 +151,7 @@ class ProductRepo extends GetxController{
     } on PlatformException catch(e){
       throw UPlatformException(e.code).message;
     }catch(e){
+
       throw "Something went wrong. Please try again";
     }
   }
@@ -173,6 +179,7 @@ class ProductRepo extends GetxController{
     } on PlatformException catch(e){
       throw UPlatformException(e.code).message;
     }catch(e){
+
       throw "Something went wrong. Please try again";
     }
   }
@@ -200,6 +207,7 @@ class ProductRepo extends GetxController{
     } on PlatformException catch(e){
       throw UPlatformException(e.code).message;
     }catch(e){
+
       throw "Something went wrong. Please try again";
     }
   }
@@ -207,7 +215,7 @@ class ProductRepo extends GetxController{
   Future<List<ProductModel>> getProductsForBrand({required String brandId,int limit = -1}) async {
     try {
 
-      final query = limit == -1
+      final query = (limit == -1 || limit <= 0)
           ? await _database.collection(UKeys.productsCollection).where('brand.id',isEqualTo: brandId).get()
           : await _database.collection(UKeys.productsCollection).where('brand.id',isEqualTo: brandId).limit(limit).get()
       ;
@@ -225,22 +233,48 @@ class ProductRepo extends GetxController{
     } on PlatformException catch(e){
       throw UPlatformException(e.code).message;
     }catch(e){
+
       throw "Something went wrong. Please try again";
     }
   }
-  Future<List<ProductModel>> getProductsForCategory({required String categoryId,int limit = 4}) async {
+  Future<List<ProductModel>> getProductsForCategory({required String categoryId,int? limit }) async {
     try {
 
-      final productCategoryQuery = limit == -1
-          ? await _database.collection(UKeys.productCategoryCollection).where('categoryId',isEqualTo: categoryId).get()
-          : await _database.collection(UKeys.productCategoryCollection).where('categoryId',isEqualTo: categoryId).limit(limit).get()
+
+      final productCategoryQuery = (limit != null && limit > 0)
+          ? await _database.collection(UKeys.productCategoryCollection).where('categoryId',isEqualTo: categoryId).limit(limit).get()
+          : await _database.collection(UKeys.productCategoryCollection).where('categoryId',isEqualTo: categoryId).get()
+
       ;
 
 
-      List<String> productIds = productCategoryQuery.docs.map((doc)=>doc['productid'] as String).toList();
+      List<String> productIds = productCategoryQuery.docs
+          .map((doc) => (doc.data()['productId'] ?? '').toString())
+          .where((id) => id.isNotEmpty).toSet()
+          .toList();
+
+
+      productIds = productIds.where((e) => e.trim().isNotEmpty).toList();
+
+      if (productIds.isEmpty) {
+
+        return [];
+      }
+
+      if (productIds.length > 10) {
+        productIds = productIds.sublist(0, 10);
+      }
+
       final productQuery  = await _database.collection(UKeys.productsCollection).where(FieldPath.documentId,whereIn: productIds).get();
+
+
+
+
+
       List<ProductModel> products = productQuery.docs.map((doc)=>ProductModel.fromSnapshot(doc)).toList();
+
       return products;
+
 
     } on FirebaseException catch(e){
       throw UFirebaseException(e.code).message;
@@ -249,19 +283,21 @@ class ProductRepo extends GetxController{
     } on PlatformException catch(e){
       throw UPlatformException(e.code).message;
     }catch(e){
-      throw "Something went wrong. Please try again";
+      print(' LỖI ĐÃ ĐƯỢC CHẶN TẠI REPO: $e');
+      return [];
     }
   }
 
   Future<List<ProductModel>> getFavouriteProducts(List<String> productIds) async{
     try {
+      if (productIds.isEmpty) return [];
 
 
       final query = await _database.collection(UKeys.productsCollection).where(FieldPath.documentId,whereIn: productIds).get();
 
 
       if(query.docs.isNotEmpty){
-        List<ProductModel> products =   query.docs.map((document)=>ProductModel.fromSnapshot(document)).toList();
+        List<ProductModel> products = query.docs.map((document)=>ProductModel.fromSnapshot(document)).toList();
         return products;
       }
       return [];
@@ -277,6 +313,7 @@ class ProductRepo extends GetxController{
     } on PlatformException catch(e){
       throw UPlatformException(e.code).message;
     }catch(e){
+
       throw "Something went wrong. Please try again";
     }
   }

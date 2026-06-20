@@ -25,8 +25,15 @@ class CategoryController extends GetxController{
       isCategoriesLoading.value = true;
 
       List<CategoryModel> categories = await _repository.getAllCategories();
+
       allCategories.assignAll(categories);
-      featuredCategories.assignAll(categories.where((category)=>category.isFeatured && category.parentId.isEmpty  ));
+      featuredCategories.assignAll(
+          categories.where((category) =>
+          category.isFeatured &&
+              (category.parentId == null || category.parentId!.trim().isEmpty)
+          ).toList()
+      );
+
 
     }catch(e){
       USnackBarHelpers.errorSnackBar(title: 'Failed',message: e.toString());
@@ -37,7 +44,9 @@ class CategoryController extends GetxController{
 
   Future<List<ProductModel>> getCategoryProducts({required String categoryId, int limit = 4}) async{
     try{
-      final products = ProductRepo.instance.getProductsForCategory(categoryId: categoryId,limit: limit);
+      final products = await ProductRepo.instance.getProductsForCategory(categoryId: categoryId,limit: limit);
+
+
       return products;
 
     }catch(e){

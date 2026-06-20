@@ -25,7 +25,7 @@ class HomeController extends GetxController  {
   }
   Future<void> initBranchSubscription() async{
     bool isConnected = await NetworkManager.instance.isConnected();
-    if(isConnected){
+    if(!isConnected){
       USnackBarHelpers.errorSnackBar(title: 'No internet', message: 'Please check your internet');
       return;
     }
@@ -41,7 +41,7 @@ class HomeController extends GetxController  {
 
   @override
   void dispose() {
-    _brandSubscription.cancel();
+    _brandSubscription?.cancel();
     super.dispose();
   }
   

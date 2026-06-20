@@ -10,8 +10,9 @@ import '../../../../../utils/helpers/helper_function.dart';
 import '../../../models/payment_method_model.dart';
 
 class UPaymentTitle extends StatelessWidget {
-  const UPaymentTitle({super.key,required this.paymentMethod});
+  const UPaymentTitle({super.key,required this.paymentMethod, this.onTap});
   final PaymentMethodModel paymentMethod;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {

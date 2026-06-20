@@ -10,6 +10,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 
 
 import 'package:shop/data/responsibilities/user/user_repo.dart';
+import 'package:shop/dummy_data.dart';
 import 'package:shop/features/authentication/screens/login/login.dart';
 import 'package:shop/features/authentication/screens/onboarding/onboarding.dart';
 import 'package:shop/features/authentication/screens/signup/verify_email.dart';
@@ -22,6 +23,7 @@ import 'package:shop/utils/exceptions/platform_exceptions.dart';
 
 
 import '../../utils/exceptions/firebase_exceptions.dart';
+import 'brand/brand_repo.dart';
 
 
 
@@ -40,6 +42,8 @@ class AuthenticationRepo extends GetxController{
   void onReady() {
       FlutterNativeSplash.remove();
       screenRedirect();
+
+      Get.put(BrandRepo()).uploadBrands(UDummyData.brands);
 
 
 

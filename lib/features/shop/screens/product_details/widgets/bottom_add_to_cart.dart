@@ -35,7 +35,7 @@ class UBottomAddToCart extends StatelessWidget {
               backgroundColor: UColors.darkGrey,
               width: 40,height: 40,
               color: UColors.white,
-              onPressed: controller.productQuantityInCart.value <1 ? null : ()=> controller.productQuantityInCart -= 1
+              onPressed: controller.productQuantityInCart.value <1 ? null : ()=> controller.productQuantityInCart.value -= 1
             ),
             SizedBox(width: USizes.spaceBtwItems,),
             Text(controller.productQuantityInCart.value.toString(),style: Theme.of(context).textTheme.titleSmall,),
@@ -46,7 +46,7 @@ class UBottomAddToCart extends StatelessWidget {
               width: 40,
               height: 40,
               color: UColors.white,
-              onPressed: ()=>controller.productQuantityInCart += 1,
+              onPressed: ()=>controller.productQuantityInCart.value += 1,
             ),
             Spacer(),
 

@@ -1,3 +1,8 @@
+import 'dart:math';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:shop/utils/helpers/network_manager.dart';
 
@@ -15,6 +20,7 @@ class PromoCodeController extends GetxController{
   RxString promoCode = ''.obs;
   RxBool isLoading = false.obs;
   Rx<PromoCodeModel> appliedPromoCode = PromoCodeModel.empty().obs;
+  RxList<PromoCodeModel> myCoupons = <PromoCodeModel>[].obs;
 
   final _repository = Get.put(PromoCodeRepo());
   final cartController = Get.put(CartController());
@@ -134,6 +140,146 @@ class PromoCodeController extends GetxController{
       
     }catch(e){
       USnackBarHelpers.errorSnackBar(title: 'Error',message: e.toString());
+    }
+  }
+
+  String _generateRandomString(int length) {
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+    final Random random = Random();
+    String code = List.generate(length, (index) => characters[random.nextInt(characters.length)]).join();
+    return 'LUCKY-$code';
+  }
+  Future<void> checkAndGenerateRewardPromoCode() async {
+    try {
+      final FirebaseFirestore db = FirebaseFirestore.instance;
+      final String currentUserId = AuthenticationRepo.instance.currentUser!.uid;
+
+
+      final userDocRef = db.collection('Users').doc(currentUserId);
+
+      await userDocRef.update({'orderCount': FieldValue.increment(1)});
+
+
+      final userSnapshot = await userDocRef.get();
+      final userData = userSnapshot.data() as Map<String, dynamic>;
+      int currentOrderCount = userData['orderCount'] ?? 0;
+
+      if (currentOrderCount >= 5) {
+        String randomCode = _generateRandomString(4);
+
+        final Map<String, dynamic> newRewardPromo = {
+          'id': randomCode,
+          'code': randomCode,
+          'name': 'Thưởng khách hàng thân thiết (Đủ 5 đơn hàng)',
+          'discount': 50.0,
+          'discountType': 'DiscountType.fixedAmount',
+          'minOrderPrice': 20.0,
+          'noOfPromoCodes': 1,
+          'isActive': true,
+          'startDate': Timestamp.fromDate(DateTime.now()),
+          'endDate': Timestamp.fromDate(DateTime.now().add(const Duration(hours: 72))),
+          'userIds': [],
+        };
+
+
+        await db.collection('Promotions').doc(randomCode).set(newRewardPromo);
+
+
+        await userDocRef.set(
+            {'orderCount': FieldValue.increment(1)},
+            SetOptions(merge: true)
+        );
+
+
+        Get.dialog(
+          AlertDialog(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            title: const Text("🎉 QUÀ THÂN THIẾT!", textAlign: TextAlign.center, style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold)),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text("Bạn đã hoàn thành xuất sắc 5 đơn hàng! Nhận ngay mã giảm giá độc quyền dành riêng cho bạn:", textAlign: TextAlign.center),
+                const SizedBox(height: 16),
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade200,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: Colors.green, style: BorderStyle.solid),
+                  ),
+                  child: Text(randomCode, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, letterSpacing: 2, color: Colors.black)),
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+
+                  Clipboard.setData(ClipboardData(text: randomCode));
+                  Get.back();
+                  USnackBarHelpers.successSnackBar(title: 'Đã sao chép', message: 'Mã đã lưu vào bộ nhớ tạm, hãy sử dụng ở đơn sau!');
+                },
+                child: const Text("Sao chép mã & Đóng", style: TextStyle(fontWeight: FontWeight.bold)),
+              )
+            ],
+          ),
+          barrierDismissible: false,
+        );
+      }
+    } catch (e) {
+
+
+      USnackBarHelpers.errorSnackBar(title: 'Lỗi Loyalty', message: e.toString());
+    }
+  }
+  Future<void> applyPromoCodeUsedToFirestore() async {
+    try {
+      if (appliedPromoCode.value.id.isEmpty) return;
+
+      final FirebaseFirestore db = FirebaseFirestore.instance;
+      final String currentUserId = AuthenticationRepo.instance.currentUser!.uid;
+      final String promoId = appliedPromoCode.value.id;
+
+
+      if (promoId.startsWith('LUCKY-')) {
+
+
+        await db.collection('users')
+            .doc(currentUserId)
+            .collection('coupons')
+            .doc(promoId)
+            .delete();
+
+
+
+      } else {
+
+
+        await db.collection('promotions').doc(promoId).update({
+          'noOfPromoCodes': FieldValue.increment(-1),
+          'userIds': FieldValue.arrayUnion([currentUserId]),
+        });
+
+
+      }
+
+    } catch (e) {
+      USnackBarHelpers.errorSnackBar(title: "Error code processing", message: e.toString());
+    }
+  }
+  Future<void> fetchMyCoupons() async {
+    try {
+      final String currentUserId = AuthenticationRepo.instance.currentUser!.uid;
+      final snapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(currentUserId)
+          .collection('coupons')
+          .get();
+
+      final list = snapshot.docs.map((doc) => PromoCodeModel.fromSnapshot(doc)).toList();
+      myCoupons.assignAll(list);
+    } catch (e) {
+     USnackBarHelpers.errorSnackBar(title: 'error', message: e.toString());
     }
   }
 }

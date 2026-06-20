@@ -3,18 +3,21 @@ import 'package:flutter/material.dart';
 
 class UCloudHelperFunctions {
 
-  static Widget? checkSingleRecordState<T>(AsyncSnapshot<T> snapshot) {
+  static Widget? checkSingleRecordState<T>({required AsyncSnapshot<List<T>> snapshot, Widget? loader, Widget? error, Widget? nothingFound}) {
     if (snapshot.connectionState == ConnectionState.waiting) {
-      return const Center(child: CircularProgressIndicator());
-    }
-
-    if (!snapshot.hasData || snapshot.data == null) {
-      return const Center(child: Text('No Data Found!'));
+      return loader ?? const Center(child: CircularProgressIndicator());
     }
 
     if (snapshot.hasError) {
-      return const Center(child: Text('Something went wrong.'));
+
+      return error ?? Center(child: Text('Lỗi: ${snapshot.error}'));
     }
+
+    if (!snapshot.hasData || snapshot.data == null || snapshot.data!.isEmpty) {
+      return nothingFound ?? const Center(child: Text('Không có dữ liệu (No Data Found)'));
+    }
+
+
 
     return null;
   }

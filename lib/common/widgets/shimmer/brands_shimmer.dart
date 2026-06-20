@@ -16,12 +16,15 @@ class UBrandsShimmer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListView.separated(
-      separatorBuilder: (context, index) => SizedBox(width: USizes.spaceBtwItems),
-      shrinkWrap: true,
-      scrollDirection: Axis.horizontal,
-      itemCount: itemCount,
-      itemBuilder: (context, index) => UShimmerEffect(width: USizes.brandCardWidth, height: USizes.brandCardHeight),
+    return SizedBox(
+      height: 49,
+      child: ListView.separated(
+        separatorBuilder: (context, index) => SizedBox(width: USizes.spaceBtwItems),
+        shrinkWrap: true,
+        scrollDirection: Axis.horizontal,
+        itemCount: itemCount,
+        itemBuilder: (context, index) => UShimmerEffect(width: USizes.brandCardWidth, height: USizes.brandCardHeight),
+      ),
     );
   }
 }

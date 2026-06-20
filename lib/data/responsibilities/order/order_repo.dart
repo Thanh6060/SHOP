@@ -10,7 +10,7 @@ class  OrderRepo  extends GetxController{
   final _database =  FirebaseFirestore.instance;
   Future<void> saveOrder(OrderModel order) async{
     try{
-      await _database.collection(UKeys.userCollection).doc(order.userId).collection(UKeys.ordersCollection).add(order.toJson());
+      await _database.collection(UKeys.userCollection).doc(order.userId).collection(UKeys.ordersCollection).doc(order.id).set(order.toJson());
 
     }catch(e){
       throw 'Something went wrong while saving order information';
@@ -32,6 +32,23 @@ class  OrderRepo  extends GetxController{
     }catch(e){
       throw 'Something went wrong while order information';
 
+    }
+  }
+
+  Future<void> updateOrderStatus(String orderId, String status) async {
+    try {
+      final userId = AuthenticationRepo.instance.currentUser!.uid;
+      if (userId.isEmpty) throw 'Unable to find user information';
+
+
+      await _database
+          .collection(UKeys.userCollection)
+          .doc(userId)
+          .collection(UKeys.ordersCollection)
+          .doc(orderId)
+          .update({'status': status});
+    } catch (e) {
+      throw 'Something went wrong while updating order status. Please try again.';
     }
   }
 }

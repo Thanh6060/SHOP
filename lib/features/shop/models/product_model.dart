@@ -64,7 +64,9 @@ class ProductModel {
   }
 
   factory ProductModel.fromSnapshot(DocumentSnapshot<Map<String, dynamic>> document) {
-    if (document.data()!.isEmpty && document.data() == null) return ProductModel.empty();
+    if (document.data() == null || document.data()!.isEmpty) {
+      return ProductModel.empty();
+    }
 
     final data = document.data()!;
     return ProductModel(
@@ -102,15 +104,22 @@ class ProductModel {
       sku: data['sku'] ?? '',
       salePrice: double.parse((data['salePrice'] ?? 0.0).toString()),
       isFeatured: data['isFeatured'] ?? false,
-      brand: BrandModel.fromJson(data['brand']),
+        brand: data['brand'] != null
+            ? BrandModel.fromJson(data['brand'])
+            : BrandModel.empty(),
       description: data['description'] ?? '',
       categoryId: data['categoryId'] ?? '',
       images: data['images'] != null ? List<String>.from(data['images']) : [],
-      productAttributes:
-          (data['productAttributes'] as List<dynamic>).map((e) => ProductAttributeModel.fromJson(e)).toList(),
-      productVariations:
-          (data['productVariations'] as List<dynamic>).map((e) => ProductVariationModel.fromJson(e)).toList(),
-        date: data['date'] != null ? (data['date'] as Timestamp).toDate() : null
+        productAttributes: data['productAttributes'] != null
+            ? (data['productAttributes'] as List)
+            .map((e) => ProductAttributeModel.fromJson(e))
+            .toList()
+            : [],
+      productVariations: data['productVariations'] != null
+          ? (data['productVariations'] as List)
+          .map((e) => ProductVariationModel.fromJson(e))
+          .toList()
+          : [],
     );
   }
 }

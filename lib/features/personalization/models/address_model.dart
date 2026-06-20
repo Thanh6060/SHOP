@@ -53,7 +53,7 @@ class AddressModel {
         postalCode: data['postalCode'] as String,
         country: data['country'] as String,
         selectedAddress: data['selectedAddress'] as bool,
-        dateTime: (data['dataTime'] as Timestamp).toDate()
+        dateTime: (data['dateTime'] as Timestamp).toDate()
     );
   }
   factory AddressModel.fromDocumentSnapshot(DocumentSnapshot snapshot){
@@ -68,7 +68,7 @@ class AddressModel {
         postalCode: data['postalCode'] ?? '',
         country: data['country'] ?? '',
         selectedAddress: data['selectedAddress'] as bool,
-        dateTime: (data['dataTime'] as Timestamp).toDate()
+        dateTime: (data['dateTime'] as Timestamp).toDate()
     );
   }
 

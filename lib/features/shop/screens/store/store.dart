@@ -26,77 +26,100 @@ class StoreScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final String voiceText = Get.arguments ?? '';
+    final TextEditingController storeSearchController = TextEditingController(text: voiceText);
       final controller = CategoryController.instance;
       final brandController = Get.put(BrandController());
-    return DefaultTabController(
-      length: controller.featuredCategories.length,
-      child: Scaffold(
-        body: NestedScrollView(
-            headerSliverBuilder:(context, innerBOxScrolled){
-              return [
-                SliverAppBar(
-                  automaticallyImplyLeading: false,
-                  expandedHeight: 340,
-                  pinned: true,
-                  floating: false,
-                  flexibleSpace:  SingleChildScrollView(
-                    child: Column(
-                      children: [
-                        UStorePrimaryHeader(),
-                        SizedBox(height: USizes.spaceBtwItems,),
-                          
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: USizes.defaultSpace),
-                          child: Column(
-                            children: [
-                              USectionHeading(title: "Branch", onPressed: ()=>Get.to(()=>BrandScreen()),),
-                          
-                              SizedBox(
-                                height: USizes.brandCardHeight,
-                                child: Obx(
-                                    (){
-                                      if(brandController.isLoading.value){
-                                        return UBrandsShimmer();
-                                      }
-                                      if(brandController.featuredBrands.isEmpty){
-                                        return Text('Brands Not Found');
-                                      }
-                                      return ListView.separated(
-                                          separatorBuilder: (context,index)=> SizedBox(width: USizes.spaceBtwItems,),
-                                          shrinkWrap: true,
-                                          itemCount: brandController.featuredBrands.length,
-                                          scrollDirection: Axis.horizontal,
-                                          itemBuilder: (context,index){
-                                            BrandModel brand = brandController.featuredBrands[index];
-                                            return SizedBox(
-                                              width: USizes.brandCardWidth,
-                                              child: UBrandCard(brand: brand, onTap: ()=>Get.to(()=>BrandProducts(
-                                                title: brand.name,
-                                                brand: brand,
-                                              )),),);
-                                          }
+      brandController.getBrands();
 
-                                      );
-                                    }
-                                ),
-                              )
-                            ],
-                          ),
-                        )
-                      ],
+    return Obx(
+
+        (){
+          if (controller.isCategoriesLoading.value) {
+            return const Scaffold(
+              body: Center(child: CircularProgressIndicator()),
+            );
+          }
+
+          // Nếu tải xong mà không có danh mục nào thỏa mãn
+          if (controller.featuredCategories.isEmpty) {
+            return const Scaffold(
+              body: Center(child: Text('Không tìm thấy danh mục nổi bật nào!')),
+            );
+          }
+
+          return DefaultTabController(
+            length: controller.featuredCategories.length,
+            child: Scaffold(
+              body: NestedScrollView(
+                headerSliverBuilder:(context, innerBOxScrolled){
+                  return [
+                    SliverAppBar(
+                      automaticallyImplyLeading: false,
+                      expandedHeight: 440,
+                      pinned: true,
+                      floating: false,
+                      flexibleSpace:  SingleChildScrollView(
+                        physics: NeverScrollableScrollPhysics(),
+                        child: Column(
+                          children: [
+                            UStorePrimaryHeader(searchController: storeSearchController,),
+                            SizedBox(height: USizes.spaceBtwItems,),
+
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: USizes.defaultSpace),
+                              child: Column(
+                                children: [
+                                  USectionHeading(title: "Branch", onPressed: ()=>Get.to(()=>BrandScreen()),),
+
+                                  SizedBox(
+                                    height: USizes.brandCardHeight,
+                                    child: Obx(
+                                            (){
+                                          if(brandController.isLoading.value){
+                                            return UBrandsShimmer();
+                                          }
+                                          if(brandController.featuredBrands.isEmpty){
+                                            return Text('Brands Not Found!!');
+                                          }
+                                          return ListView.separated(
+                                              separatorBuilder: (context,index)=> SizedBox(width: USizes.spaceBtwItems,),
+                                              shrinkWrap: true,
+                                              itemCount: brandController.featuredBrands.length,
+                                              scrollDirection: Axis.horizontal,
+                                              itemBuilder: (context,index){
+                                                BrandModel brand = brandController.featuredBrands[index];
+                                                return SizedBox(
+                                                  width: USizes.brandCardWidth,
+                                                  child: UBrandCard(brand: brand, onTap: ()=>Get.to(()=>BrandProducts(
+                                                    title: brand.name,
+                                                    brand: brand,
+                                                  )),),);
+                                              }
+
+                                          );
+                                        }
+                                    ),
+                                  )
+                                ],
+                              ),
+                            )
+                          ],
+                        ),
+                      ),
+                      bottom: UTabBar(
+                          tabs: controller.featuredCategories.map((category)=>Tab(child: Text(category.name),)).toList()
+                      ),
                     ),
-                  ),
-                  bottom: UTabBar(
-                    tabs: controller.featuredCategories.map((category)=>Tab(child: Text(category.name),)).toList()
-                  ),
+                  ];
+                },
+                body: TabBarView(
+                    children: controller.featuredCategories.map((category)=>UCategoryTab(category: category,)).toList()
                 ),
-              ];
-            },
-            body: TabBarView(
-                children: controller.featuredCategories.map((category)=>UCategoryTab(category: category,)).toList()
+              ),
             ),
-        ),
-      ),
+          );
+        }
     );
   }
 }

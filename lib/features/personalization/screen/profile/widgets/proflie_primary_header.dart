@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
 import '../../../../../common/widgets/custom_shapes/primary_header_container.dart';
 
 import '../../../../../common/widgets/images/user_proflie_logo.dart';
 
 import '../../../../../utils/constants/sizes.dart';
+import '../../../controllers/user_controller.dart';
 
 class UProfilePrimaryHeader extends StatelessWidget {
   const UProfilePrimaryHeader({
@@ -13,6 +15,7 @@ class UProfilePrimaryHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+     Get.put(UserController(), permanent: true);
     return Stack(
       children: [
         SizedBox(height: USizes.profilePrimaryHeaderHeight +60,),

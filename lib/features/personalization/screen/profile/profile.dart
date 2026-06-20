@@ -5,6 +5,7 @@ import 'package:iconsax/iconsax.dart';
 import 'package:shop/common/widgets/texts/section_heading.dart';
 import 'package:shop/data/responsibilities/authentication_repo.dart';
 import 'package:shop/features/personalization/screen/address/address.dart';
+import 'package:shop/features/personalization/screen/profile/widgets/coupons.dart';
 import 'package:shop/features/personalization/screen/profile/widgets/proflie_primary_header.dart';
 import 'package:shop/features/personalization/screen/profile/widgets/setting_menu_title.dart';
 import 'package:shop/features/personalization/screen/profile/widgets/user_profile_title.dart';
@@ -13,11 +14,14 @@ import 'package:shop/features/shop/screens/order/order.dart';
 
 import 'package:shop/utils/constants/sizes.dart';
 
+import '../../controllers/user_controller.dart';
+
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    Get.put(UserController(), permanent: true);
     return Scaffold(
       body: SingleChildScrollView(
         child: Column(
@@ -52,6 +56,11 @@ class ProfileScreen extends StatelessWidget {
                       subtitle: "In progress and Completed Orders",
                     onTap: ()=>Get.to(()=>OrderScreen()),
                   ),
+                  SettingMenuTitle(
+                      icon: Iconsax.gift,
+                      title: "My Voucher",
+                      subtitle: "Manage your vouchers",
+                      onTap: ()=> Get.to(()=> MyCouponsScreen())),
                   SizedBox(height: USizes.spaceBtwSections,),
                   SizedBox(
                     width: double.infinity,

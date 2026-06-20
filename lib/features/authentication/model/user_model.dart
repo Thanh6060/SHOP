@@ -12,6 +12,7 @@ class UserModel{
   String phoneNumber;
   String profilePicture;
   String publicId;
+  final String gender;
 
   UserModel({
     required this.id,
@@ -21,7 +22,8 @@ class UserModel{
     required this.email,
     required this.phoneNumber,
     required this.profilePicture,
-    this.publicId = ''
+    this.publicId = '',
+    this.gender = ''
   });
 
   /// Function to get the full name
@@ -32,7 +34,7 @@ class UserModel{
 
 
   /// static function to create an empty user model
-  static UserModel empty() => UserModel(id: "", firstName: "", lastName: "", username: "", email: "", phoneNumber: "", profilePicture: "");
+  static UserModel empty() => UserModel(id: "", firstName: "", lastName: "", username: "", email: "", phoneNumber: "", profilePicture: "", publicId: "", gender: "");
 
   Map<String, dynamic> toJson(){
     return {
@@ -43,7 +45,9 @@ class UserModel{
       'email' : email,
       'phoneNumber' : phoneNumber,
       'profilePicture' : profilePicture,
-      'publicId' : publicId
+      'publicId' : publicId,
+      'gender' : gender
+
     };
   }
 
@@ -58,11 +62,35 @@ class UserModel{
           email: data['email'] ?? '',
           phoneNumber: data['phoneNumber'] ?? '',
           profilePicture: data['profilePicture'] ?? '',
-          publicId: data['publicId']
+          publicId: data['publicId'],
+          gender: data['gender'] ?? ''
       );
     }else{
       return UserModel.empty();
     }
+  }
+
+
+  UserModel copyWith({
+    String? id,
+    String? firstName,
+    String? lastName,
+    String? username,
+    String? email,
+    String? phoneNumber,
+    String? profilePicture,
+    String? gender
+  }) {
+    return UserModel(
+      id: id ?? this.id,
+      firstName: firstName ?? this.firstName,
+      lastName: lastName ?? this.lastName,
+      username: username ?? this.username,
+      email: email ?? this.email,
+      phoneNumber: phoneNumber ?? this.phoneNumber,
+      profilePicture: profilePicture ?? this.profilePicture,
+      gender: gender ?? this.gender
+    );
   }
 
 }

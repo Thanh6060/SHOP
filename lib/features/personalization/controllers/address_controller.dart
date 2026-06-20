@@ -25,6 +25,7 @@ class AddressController extends GetxController{
   final _repository = Get.put(AddressRepo());
   Rx<AddressModel> selectedAddress = AddressModel.empty().obs;
   RxBool refreshData = false.obs;
+  String countryCode = '+84';
 
   GlobalKey<FormState> addressFormKey = GlobalKey<FormState>();
   Future<void> addNewAddress() async{
@@ -35,7 +36,7 @@ class AddressController extends GetxController{
         UFullScreenLoader.stopLoading();
         return;
       }
-      if(addressFormKey.currentState!.validate()){
+      if(!addressFormKey.currentState!.validate()){
         UFullScreenLoader.stopLoading();
         return;
       }
@@ -59,8 +60,7 @@ class AddressController extends GetxController{
      USnackBarHelpers.successSnackBar(title: 'Congratulations',message: 'Your address has been save successfully');
      refreshData.toggle();
      resetFormFields();
-     Navigator.pop(Get.context!);
-      Navigator.pop(Get.context!);
+     Get.back();
     }catch(e){
   UFullScreenLoader.stopLoading();
   USnackBarHelpers.errorSnackBar(title: "Failed",message: e.toString());

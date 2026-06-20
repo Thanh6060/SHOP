@@ -35,23 +35,26 @@ class BrandModel{
     final data = document;
     if(data.isEmpty) return BrandModel.empty();
     return BrandModel(
-        id: data['id'],
-        image: data['image'],
-        name: data['name'],
-        isFeatured: data['isFeatured'],
-        productsCount: data['productCount']
+      id: data['id']?.toString() ?? '',
+      name: data['name']?.toString() ?? '',
+      image: data['image']?.toString() ?? '',
+      isFeatured: data['isFeatured'] ?? false,
+      productsCount: data['productsCount'] ?? 0,
     );
   }
 
   factory BrandModel.fromSnapshot(DocumentSnapshot<Map<String, dynamic>> document){
     if(document.data() != null){
       Map<String, dynamic> data = document.data()!;
+
+
+
       return BrandModel(
-          id: data['id'],
-          image: data['image'],
-          name: data['name'],
-          isFeatured: data['isFeatured'],
-          productsCount: data['productCount']
+        id: data['id']?.toString() ?? '',
+        name: data['name']?.toString() ?? '',
+        image: data['image']?.toString() ?? '',
+        isFeatured: data['isFeatured'] ?? false,
+        productsCount: data['productsCount'] ?? 0,
       );
     }else{
       return BrandModel.empty();

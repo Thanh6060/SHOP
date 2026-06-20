@@ -6,7 +6,7 @@ import 'package:shop/features/shop/models/category_model.dart';
 import 'package:shop/features/shop/models/product_model.dart';
 import 'package:shop/features/shop/screens/all_products/all_products.dart';
 import 'package:shop/features/shop/screens/store/widgets/category_brands.dart';
-import 'package:shop/utils/helpers/cloud_helper_functions.dart';
+
 
 
 import '../../../../../common/widgets/layouts/grid_layouts.dart';
@@ -27,7 +27,8 @@ class UCategoryTab extends StatelessWidget {
     final controller = CategoryController.instance;
     return ListView(
       shrinkWrap: true,
-      physics: NeverScrollableScrollPhysics(),
+      physics: ClampingScrollPhysics(),
+      padding: const EdgeInsets.symmetric(horizontal: USizes.defaultSpace),
       children: [
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: USizes.defaultSpace),
@@ -36,15 +37,23 @@ class UCategoryTab extends StatelessWidget {
               CategoryBrands(category: category,),
 
               SizedBox(height: USizes.spaceBtwItems,),
-              USectionHeading(title: "You might like", onPressed: ()=>Get.to(()=>AllProductsScreen(title: category.name,
-              futureMethod: controller.getCategoryProducts(categoryId: category.id,limit: -1),
-              )),),
+              USectionHeading(title: "You might like",
+                onPressed: (){
+                final futureMethod = controller.getCategoryProducts(categoryId: category.id,limit: 9999);
+                  Get.to(()=>AllProductsScreen(title: category.name,
+                    futureMethod: futureMethod,
+                  ));
+                }),
               FutureBuilder(
-                  future: controller.getCategoryProducts(categoryId: category.id),
+                  future: controller.getCategoryProducts(categoryId: category.id.toString()),
                   builder: (context,snapshot){
                     const loader = UVerticalProductShimmer(itemCount: 4,);
-                    final widget = UCloudHelperFunctions.checkMultiRecordState(snapshot: snapshot,loader: loader);
-                    if(widget != null) return widget;
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return loader;
+                    }
+                    if (snapshot.hasError || !snapshot.hasData || snapshot.data!.isEmpty) {
+                      return const SizedBox.shrink();
+                    }
                     List<ProductModel> products = snapshot.data!;
                     return UGridLayout(
                       itemCount: products.length,

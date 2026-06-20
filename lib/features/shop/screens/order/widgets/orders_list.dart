@@ -12,6 +12,8 @@ import 'package:shop/utils/constants/sizes.dart';
 import 'package:shop/utils/helpers/cloud_helper_functions.dart';
 import 'package:shop/utils/helpers/helper_function.dart';
 
+import 'detail.dart';
+
 class UOrdersListItem extends StatelessWidget {
   const UOrdersListItem({super.key});
 
@@ -60,7 +62,7 @@ class UOrdersListItem extends StatelessWidget {
                               ],
                             ),
                           ),
-                          IconButton(onPressed: (){}, icon: Icon(Iconsax.arrow_right_34,size: USizes.iconSm,))
+                          IconButton(onPressed: ()=> Get.to(()=>DetailScreen(orderId: order.id,)), icon: Icon(Iconsax.arrow_right_34,size: USizes.iconSm,))
                         ],
                       ),
                       SizedBox(height: USizes.spaceBtwItems,),

@@ -30,7 +30,8 @@ class AddressRepo extends GetxController{
     } on PlatformException catch(e){
       throw UPlatformException(e.code).message;
     }catch(e){
-      throw "Something went wrong while saving Address Information. Please try again";
+
+      rethrow ;
     }
   }
   Future<List<AddressModel>> fetchUserAddress() async{
@@ -53,7 +54,8 @@ return [];
     } on PlatformException catch(e){
       throw UPlatformException(e.code).message;
     }catch(e){
-      throw "Unable to find address. Please try again";
+
+      rethrow ;
     }
   }
   Future<void> updateSelectedField(String addressId,bool selected) async{
@@ -62,7 +64,8 @@ return [];
       await _database.collection(UKeys.userCollection).doc(userId).collection(UKeys.addressCollection).doc(addressId).update({'selectedAddress':selected});
 
     }catch(e){
-      throw 'Unable to update selected address. Please try again';
+
+      rethrow ;
 
     }
   }

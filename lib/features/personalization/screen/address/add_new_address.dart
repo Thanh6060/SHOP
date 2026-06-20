@@ -1,3 +1,5 @@
+import 'package:country_code_picker/country_code_picker.dart';
+import 'package:country_picker/country_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
@@ -35,7 +37,18 @@ class AddNewAddressScreen extends StatelessWidget {
                     controller: controller.phoneNumber,
                     validator: (value)=>UValidator.validateEmptyText('Phone Number', value),
                     decoration: InputDecoration(
-                        prefixIcon: Icon(Iconsax.mobile),labelText: "Phone Number"),),
+                        prefixIcon: CountryCodePicker(
+                          initialSelection: 'VN',
+                          favorite: const ['VN', '+84', 'US',],
+                          showDropDownButton: true,
+                          showCountryOnly: false,
+                          showOnlyCountryWhenClosed: false,
+                          alignLeft: false,
+                          onChanged: (country) {
+                            controller.countryCode =
+                                country.dialCode ?? "+84";
+                          },
+                        ),labelText: "Phone Number"),),
                   SizedBox(height: USizes.spaceBtwInputFields,),
 
                   Row(
@@ -85,9 +98,22 @@ class AddNewAddressScreen extends StatelessWidget {
 
                   TextFormField(
                     controller: controller.country,
-                    validator: (value)=>UValidator.validateEmptyText('Country', value),
+                    readOnly: true,
                     decoration: InputDecoration(
-                        prefixIcon: Icon(Iconsax.global),labelText: "Country"),),
+                      labelText: "Country",
+                      prefixIcon: Icon(Iconsax.global),
+                      suffixIcon: Icon(Icons.arrow_drop_down),
+                    ),
+                    onTap: () {
+                      showCountryPicker(
+                        context: context,
+                        onSelect: (country) {
+                          controller.country.text =
+                              country.name;
+                        },
+                      );
+                    },
+                  ),
                   SizedBox(height: USizes.spaceBtwSections,),
 
                   UElevatedButton(onPressed: controller.addNewAddress, child: Text("Save"))

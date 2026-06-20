@@ -27,7 +27,7 @@ class MyApp extends StatelessWidget {
       darkTheme: UAppTheme.darkTheme,
       getPages: UAppRoutes.screens,
       initialBinding: UBindings(),
-      home: LoadingScreen(),
+      home:LoadingScreen(),
     );
   }
 }

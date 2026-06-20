@@ -5,10 +5,11 @@ import 'package:shop/common/widgets/shimmer/boxes_shimmer.dart';
 import 'package:shop/common/widgets/shimmer/list_tile_shimmer.dart';
 import 'package:shop/features/shop/controllers/brand/brand_controller.dart';
 import 'package:shop/features/shop/models/category_model.dart';
-import 'package:shop/utils/helpers/cloud_helper_functions.dart';
+
 
 import '../../../../../common/widgets/brands/brand_showcase.dart';
 
+import '../../../../../common/widgets/shimmer/brands_shimmer.dart';
 import '../../../../../utils/constants/sizes.dart';
 
 class CategoryBrands extends StatelessWidget {
@@ -31,9 +32,29 @@ class CategoryBrands extends StatelessWidget {
             SizedBox(height: USizes.spaceBtwItems,),
           ],
         );
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return loader;
+        }
 
-        final widget =    UCloudHelperFunctions.checkMultiRecordState(snapshot: snapshot,loader: loader);
-        if(widget != null) return widget;
+        if (snapshot.hasError) {
+
+          return Text("ERROR");
+        }
+
+        if (!snapshot.hasData) {
+
+          return Text("NO DATA");
+        }
+
+
+
+        if (snapshot.data!.isEmpty) {
+
+          return const Center(
+            child: Text("No Brand Data Found for this Category!"),
+          );
+        }
+
         final brands = snapshot.data!;
        return ListView.builder(
          physics: NeverScrollableScrollPhysics(),
@@ -43,10 +64,17 @@ class CategoryBrands extends StatelessWidget {
 
          final brand = brands[index];
          return FutureBuilder(
+
+
            future: controller.getBrandProducts(brand.id,limit: 3),
+
            builder: (context,snapshot){
-             final widget = UCloudHelperFunctions.checkMultiRecordState(snapshot: snapshot);
-             if(widget != null ) return widget;
+             if (snapshot.connectionState == ConnectionState.waiting) {
+               return const UBrandsShimmer();
+             }
+             if (snapshot.hasError || !snapshot.hasData || snapshot.data!.isEmpty) {
+               return UBrandShowCase(brand: brand, images: const []);
+             }
              final products = snapshot.data!;
              return UBrandShowCase(
                  brand: brand,

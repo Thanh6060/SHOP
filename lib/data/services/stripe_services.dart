@@ -1,4 +1,4 @@
-import 'dart:math';
+
 
 import 'package:flutter/material.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
@@ -41,7 +41,8 @@ class StripServices extends GetxController{
     try {
       // 1. Create payment intent on the server
       final data = await createPaymentIntent(currency, amount);
-      log(data.toString() as num);
+
+
 
       // 2. Create billing details (optional)
 
@@ -49,20 +50,20 @@ class StripServices extends GetxController{
       // 3. Initialize the payment sheet
       await Stripe.instance.initPaymentSheet(
         paymentSheetParameters: SetupPaymentSheetParameters(
-          // Main params
-          customFlow: true,
+
+          customFlow: false,
           paymentIntentClientSecret: data['client_secret'],
           merchantDisplayName: 'Shopping App',
-          // Customer params
-          customerId: data['id'],
 
-          // Return URL for redirect-based payment methods
-         // returnURL: 'flutterstripe://redirect',
-          // Extra options
-         // primaryButtonLabel: 'Pay now',
-          applePay: PaymentSheetApplePay(
-            merchantCountryCode: 'US',
-          ),
+         // customerId: data['id'],
+
+
+          returnURL: 'flutterstripe://redirect',
+
+         primaryButtonLabel: 'Pay now',
+         // applePay: PaymentSheetApplePay(
+        //    merchantCountryCode: 'US',
+        //  ),
           googlePay: PaymentSheetGooglePay(
             merchantCountryCode: 'US',
             testEnv: true,
@@ -74,7 +75,9 @@ class StripServices extends GetxController{
 
     } catch (e) {
 
+
       throw 'Something went wrong while initializing payment sheet';
+
     }
   }
 

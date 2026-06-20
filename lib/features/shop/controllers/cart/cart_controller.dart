@@ -37,7 +37,7 @@ class CartController  extends GetxController{
 
   Future<void> checkout(ProductModel product) async{
 
-    cartItems.clear();
+
 
     productQuantityInCart.value = 1;
 
@@ -69,11 +69,12 @@ class CartController  extends GetxController{
       //  cartItems[index].quantity = selectedCartItem.quantity;
 
     //  }else {
+    cartItems.clear();
         cartItems.add(selectedCartItem);
     //  }
       updateCartToTotals();
 
-    //  USnackBarHelpers.customToast(message: 'Your product has been added to the cart');
+     USnackBarHelpers.customToast(message: 'Your product has been added to the cart');
 
       await Get.to(()=>CheckoutScreen());
 

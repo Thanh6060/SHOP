@@ -20,6 +20,7 @@ class SignupController extends GetxController{
   final email = TextEditingController();
   final phoneNumber = TextEditingController();
   final password = TextEditingController();
+  String countryCode = "+84";
 
   Future<void> registerUser() async {
     try{

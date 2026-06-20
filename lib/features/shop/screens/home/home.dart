@@ -43,7 +43,6 @@ class HomeScreen extends StatelessWidget {
           children: [
             // upper part
             Stack(
-        
               children: [
                 SizedBox(height: USizes.homePrimaryHeaderHeight + 10,),
                 UPrimaryHeaderContainer(
@@ -58,7 +57,11 @@ class HomeScreen extends StatelessWidget {
                   ),
                 ),
         
-                USearchBar(),
+                Positioned(
+                    bottom: 0,
+                    left: USizes.defaultSpace,
+                    right: USizes.defaultSpace,
+                    child: USearchBar()),
         
               ],
             ),

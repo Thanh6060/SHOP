@@ -24,7 +24,7 @@ class UserController extends GetxController{
   Rx<UserModel> user =  UserModel.empty().obs;
   RxBool profileLeading = false.obs;
   RxBool isProfileUploading = false.obs;
-  final email = TextEditingController();
+  final  email = TextEditingController();
   final password = TextEditingController();
   final reAuthFormKey = GlobalKey<FormState>();
   RxBool isPasswordVisible = false.obs;

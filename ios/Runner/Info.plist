@@ -103,6 +103,11 @@
         <string>Scan your card to add it automatically</string>
         <key>NSCameraUsageDescription</key>
         <string>To scan cards</string>
+        <key>NSSpeechRecognitionUsageDescription</key>
+        <string>Recognition use and display</string>
+        <key>NSMicrophoneUsageDescription</key>
+        <string>Defect speech input</string>
+
 
 	</dict>
 </plist>

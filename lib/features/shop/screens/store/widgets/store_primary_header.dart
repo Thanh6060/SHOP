@@ -11,11 +11,14 @@ import '../../../../../common/widgets/custom_shapes/primary_header_container.dar
 class UStorePrimaryHeader extends StatelessWidget {
   const UStorePrimaryHeader({
     super.key,
+    this.searchController,
   });
+  final TextEditingController? searchController;
 
   @override
   Widget build(BuildContext context) {
     return Stack(
+      clipBehavior: Clip.none,
 
       children: [
         SizedBox(height: USizes.storePrimaryHeaderHeight+ 10,),
@@ -32,7 +35,11 @@ class UStorePrimaryHeader extends StatelessWidget {
           ),
         ),
 
-        USearchBar(),
+        Positioned(
+            bottom: 10, // Cách đáy khối màu xanh 10 pixel
+            left: USizes.defaultSpace,   // Ép lề trái theo chuẩn dự án của bạn
+            right: USizes.defaultSpace,
+            child: USearchBar(searchController: searchController,)),
 
       ],
     );

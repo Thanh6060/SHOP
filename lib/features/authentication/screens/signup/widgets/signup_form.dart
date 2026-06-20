@@ -1,3 +1,4 @@
+import 'package:country_code_picker/country_code_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
@@ -65,7 +66,18 @@ class USignupForm extends StatelessWidget {
             validator: (value)=>UValidator.validatePhoneNumber(value),
             decoration: InputDecoration(
               labelText: UTexts.phoneNumber,
-              prefixIcon: Icon(Iconsax.call),
+              prefixIcon: CountryCodePicker(
+                initialSelection: 'VN',
+                favorite: const ['VN', '+84', 'US',],
+                showDropDownButton: true,
+                showCountryOnly: false,
+                showOnlyCountryWhenClosed: false,
+                alignLeft: false,
+                onChanged: (country) {
+                  controller.countryCode =
+                      country.dialCode ?? "+84";
+                },
+              ),
             ),
           ),
           SizedBox(height: USizes.spaceBtwInputFields,),

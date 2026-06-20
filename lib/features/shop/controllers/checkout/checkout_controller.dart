@@ -9,8 +9,10 @@ import 'package:shop/utils/constants/enums.dart';
 import 'package:shop/utils/constants/images.dart';
 import 'package:shop/utils/constants/sizes.dart';
 
+import '../../../../common/widgets/qrcode/qr_code_payment.dart';
 import '../../../../data/services/stripe_services.dart';
 import '../../../../utils/popups/snackbar_helpers.dart';
+import '../../models/promo_code_model.dart';
 import '../../screens/checkout/widgets/payment_tile.dart';
 import '../order/order_controller.dart';
 
@@ -45,6 +47,25 @@ class CheckoutController extends GetxController{
            SizedBox(height: USizes.spaceBtwItems/2,),
            UPaymentTitle(paymentMethod: PaymentMethodModel(name: 'Credit/Debit Card', image: UImages.creditCard,paymentMethod: PaymentMethods.creditCard)),
            SizedBox(height: USizes.spaceBtwItems/2,),
+           UPaymentTitle(paymentMethod: PaymentMethodModel(name: 'Master Card', image: UImages.masterCard,paymentMethod: PaymentMethods.masterCard)),
+           SizedBox(height: USizes.spaceBtwItems/2,),
+           UPaymentTitle(
+             paymentMethod: PaymentMethodModel(
+                 name: 'VietQR Payment',
+                 image: UImages.googlePay,
+                 paymentMethod: PaymentMethods.qr
+             ),
+             onTap: () {
+               selectedPaymentMethod.value = PaymentMethodModel(
+                   name: 'VietQR Payment',
+                   image: UImages.googlePay,
+                   paymentMethod: PaymentMethods.qr
+               );
+               Navigator.pop(context);
+             },
+           ),
+           SizedBox(height: USizes.spaceBtwItems / 2),
+
 
          ],
        ), 
@@ -56,16 +77,26 @@ class CheckoutController extends GetxController{
     try{
       isPaymentSuccess.value = true;
       PaymentMethods paymentMethod = selectedPaymentMethod.value.paymentMethod;
+      String orderId = "DH${DateTime.now().millisecondsSinceEpoch.toString().substring(8)}";
       switch(paymentMethod){
         case PaymentMethods.creditCard:
-          await _stripeServices.initPaymentSheet('USD', totalAmount.toInt());
+          await _stripeServices.initPaymentSheet('USD', (totalAmount * 100).round());
           await _stripeServices.showPaymentSheet();
+          break;
 
 
         case PaymentMethods.cashOnDelivery:
           break;
+        case PaymentMethods.paypal:
+          break;
+        case PaymentMethods.masterCard:
+          break;
+        case PaymentMethods.qr:
+
+          await Get.to(() => QRPaymentPage(amount: totalAmount, orderId: orderId));
+          break;
         default:
-         throw 'Payment method not supported';
+          throw 'Payment method not supported';
 
       }
       isPaymentSuccess.value = false;
@@ -74,9 +105,15 @@ class CheckoutController extends GetxController{
 
      await _orderController.processOrder(totalAmount);
 
-    await PromoCodeController.instance.decreaseNoOfPromoCode();
+      final promoController = PromoCodeController.instance;
 
-    await PromoCodeController.instance.addUserToPromoCode();
+      if (promoController.appliedPromoCode.value.id.isNotEmpty) {
+        await promoController.applyPromoCodeUsedToFirestore();
+        promoController.appliedPromoCode.value = PromoCodeModel.empty();
+        promoController.promoCode.value = '';
+      }
+
+      await promoController.checkAndGenerateRewardPromoCode();
     }catch(e){
       isPaymentSuccess.value = false;
       USnackBarHelpers.errorSnackBar(title: 'Error!',message: e.toString());
@@ -84,5 +121,8 @@ class CheckoutController extends GetxController{
     }
 
   }
+
+
+
 }
 

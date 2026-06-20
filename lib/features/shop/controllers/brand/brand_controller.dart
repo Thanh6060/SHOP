@@ -15,7 +15,6 @@ class BrandController extends GetxController{
 
   @override
   void onInit() {
-    // TODO: implement onInit
     getBrands();
     super.onInit();
   }
@@ -25,12 +24,18 @@ class BrandController extends GetxController{
       isLoading.value = true;
 
         List<BrandModel> allBrands = await _repository.fetchBrands();
+
+
+
         this.allBrands.assignAll(allBrands);
         featuredBrands.assignAll(allBrands.where((brand)=>brand.isFeatured ?? false).toList());
 
+
+
     }catch(e){
       USnackBarHelpers.errorSnackBar(title: 'Failed', message: e.toString());
-    }finally{
+    }
+    finally{
       isLoading.value = false;
     }
   }

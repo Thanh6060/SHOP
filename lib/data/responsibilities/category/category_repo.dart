@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:shop/data/services/cloudinary_services.dart';
+import 'package:shop/features/shop/models/brand_category_model.dart';
 import 'package:shop/features/shop/models/category_model.dart';
 import 'package:shop/features/shop/models/product_category_model.dart';
 import 'package:shop/utils/constants/keys.dart';
@@ -21,10 +22,10 @@ class CategoryRepo extends GetxController{
   static CategoryRepo get instance => Get.find();
   final _database = FirebaseFirestore.instance;
   final _cloudinaryServices = Get.put(CloudinaryServices());
-  Future<void> uploadBrandCategory(List<CategoryModel> brandCategories) async{
+  Future<void> uploadBrandCategory(List<BrandCategoryModel> brandCategories) async{
     try{
       for(final brandCategory in brandCategories) {
-        await _database.collection(UKeys.brandsCollection).doc().set(
+        await _database.collection(UKeys.brandCategoryCollection).doc().set(
             brandCategory.toJson());
       }
     } on FirebaseException catch(e){
@@ -34,6 +35,7 @@ class CategoryRepo extends GetxController{
     } on PlatformException catch(e){
       throw UPlatformException(e.code).message;
     }catch(e){
+      print('lỗi : $e');
       throw "Something went wrong. Please try again";
     }
   }
@@ -52,6 +54,7 @@ class CategoryRepo extends GetxController{
     } on PlatformException catch(e){
       throw UPlatformException(e.code).message;
     }catch(e){
+
       throw "Something went wrong. Please try again";
     }
   }
@@ -75,6 +78,7 @@ class CategoryRepo extends GetxController{
     } on PlatformException catch(e){
       throw UPlatformException(e.code).message;
     }catch(e){
+      print('lỗi : $e');
       throw "Something went wrong. Please try again";
     }
   }
@@ -98,6 +102,7 @@ class CategoryRepo extends GetxController{
     } on PlatformException catch(e){
       throw UPlatformException(e.code).message;
     }catch(e){
+
       throw "Something went wrong. Please try again";
     }
   }
@@ -121,6 +126,7 @@ class CategoryRepo extends GetxController{
     } on PlatformException catch(e){
       throw UPlatformException(e.code).message;
     }catch(e){
+
       throw "Something went wrong. Please try again";
     }
   }

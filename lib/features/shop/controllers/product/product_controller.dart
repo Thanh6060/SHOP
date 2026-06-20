@@ -113,7 +113,7 @@ class ProductController extends GetxController{
 
     try{
       bool isConnected = await NetworkManager.instance.isConnected();
-      if(isConnected){
+      if(!isConnected){
         USnackBarHelpers.errorSnackBar(title: 'No Internet', message: 'Please check your internet');
         return;
       }
